@@ -1,0 +1,19 @@
+name: inkeep-widget
+title: Inkeep
+organization: evOrtg4IGZmDeSXc5kqz
+visibility: private
+description: ''
+script: src/index.tsx
+scopes:
+  - space:content:read
+  - space:content:write
+  - space:metadata:read
+  - space:metadata:write
+  - space:views:read
+  - space:git:sync
+  - entities:write
+blocks:
+  - id: inkeep-widget
+    title: Inkeep
+    description: My GitBook Integration
+secrets: {}
