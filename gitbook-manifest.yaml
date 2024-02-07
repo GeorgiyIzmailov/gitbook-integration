@@ -1,19 +1,17 @@
 name: inkeep-widget
-title: Inkeep
-organization: evOrtg4IGZmDeSXc5kqz
+title: Inkeep AI Chat
+organization: YOUR_ORGANIZATION_ID
 visibility: private
-description: ''
+description: 'Add Inkeep AI Chat'
 script: src/index.tsx
+icon: ./assets/inkeep_logo.png
 scopes:
   - space:content:read
   - space:content:write
   - space:metadata:read
   - space:metadata:write
-  - space:views:read
-  - space:git:sync
-  - entities:write
 blocks:
   - id: inkeep-widget
-    title: Inkeep
-    description: My GitBook Integration
+    title: Inkeep widget
+    description: ''
 secrets: {}

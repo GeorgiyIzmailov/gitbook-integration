@@ -3,54 +3,83 @@ import {
     createComponent,
     FetchEventCallback,
     RuntimeContext,
-  } from "@gitbook/runtime";
+} from '@gitbook/runtime';
 
-  type IntegrationContext = {} & RuntimeContext;
-  type IntegrationBlockProps = {};
-  type IntegrationBlockState = { message: string };
-  type IntegrationAction = { action: "click" };
+import { addInkeepWidget } from '../InkeepConfig';
 
-  const handleFetchEvent: FetchEventCallback<IntegrationContext> = async (
-    request,
-    context
-  ) => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { api } = context;
-    const user = api.user.getAuthenticatedUser();
+type IntegrationContext = {} & RuntimeContext;
+type IntegrationBlockProps = { content?: string };
+type IntegrationBlockState = { content: string };
+type IntegrationAction = {};
 
-    return new Response(JSON.stringify(user));
-  };
+const WIDGET_VERSION = '0.2.258';
 
-  const exampleBlock = createComponent<
-     IntegrationBlockProps,
-     IntegrationBlockState,
-     IntegrationAction,
-     IntegrationContext
-  >({
-    componentId: "inkeep-widget",
-    initialState: (props) => {
-      return {
-        message: "Click Me",
-      };
+
+const handleFetchEvent: FetchEventCallback<IntegrationContext> = async () => {
+    return new Response(
+        `
+<html>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 4px;
+    }
+  </style>
+  <body>
+    <script
+      defer
+      type="module"
+      src="https://unpkg.com/@inkeep/widgets-embed@${WIDGET_VERSION}/dist/embed.js"
+    ></script>
+    <script type="module" defer>
+      (${addInkeepWidget.toString()})()
+    </script>
+  </body>
+</html>
+`,
+        {
+            headers: {
+                'Content-Type': 'text/html',
+            },
+        }
+    );
+};
+
+const inkeepChatComponent = createComponent<
+    IntegrationBlockProps,
+    IntegrationBlockState,
+    IntegrationAction,
+    IntegrationContext
+>({
+    componentId: 'inkeep-widget',
+    initialState: () => {
+        return {
+            content: ``,
+        };
     },
-    action: async (element, action, context) => {
-      switch (action.action) {
-        case "click":
-          console.log("Button Clicked");
-          return {};
-      }
+    action: async () => {
+        return {};
     },
     render: async (element, context) => {
-      return (
-        <block>
-          <button label={element.state.message} onPress={{ action: "click" }} />
-        </block>
-      );
-    },
-  });
+        const { environment } = context;
 
-  export default createIntegration({
+        return (
+            <block>
+                <webframe
+                    source={{
+                        url: environment.integration.urls.publicEndpoint,
+                    }}
+                    aspectRatio={0.714286 / 1}
+                    data={{
+                        content: element.dynamicState('content'),
+                    }}
+                />
+            </block>
+        );
+    },
+});
+
+export default createIntegration({
     fetch: handleFetchEvent,
-    components: [exampleBlock],
-    events: {},
-  });
+    components: [inkeepChatComponent],
+});
